@@ -1,0 +1,1116 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --primary: #818cf8;
+  --primary-glow: rgba(129, 140, 248, 0.35);
+  --bg-color: #07090f;
+  --card-bg: rgba(15, 18, 30, 0.75);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-border-hover: rgba(255, 255, 255, 0.14);
+  --text-primary: #f0f2f5;
+  --text-secondary: rgba(255, 255, 255, 0.45);
+  --card-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.6);
+
+  /* Dynamic theme orb colours – overridden per weather theme */
+  --orb-1: rgba(129, 140, 248, 0.15);
+  --orb-2: rgba(192, 132, 252, 0.10);
+  --orb-3: rgba(99, 102, 241, 0.12);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   DYNAMIC WEATHER THEME BACKGROUNDS
+   Ambient orbs shift colour, speed, and size based on weather.
+   ============================================================ */
+
+/* ---- Ambient Orb Base ---- */
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 0;
+  transition: background 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+    width 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+    height 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  top: -15%;
+  left: -10%;
+  background: var(--orb-1);
+  animation: orbFloat1 14s ease-in-out infinite alternate;
+}
+
+.orb-2 {
+  width: 400px;
+  height: 400px;
+  bottom: -10%;
+  right: -10%;
+  background: var(--orb-2);
+  animation: orbFloat2 18s ease-in-out infinite alternate;
+}
+
+.orb-3 {
+  width: 350px;
+  height: 350px;
+  top: 40%;
+  left: 50%;
+  background: var(--orb-3);
+  animation: orbFloat3 12s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(60px, 40px) scale(1.15);
+  }
+}
+
+@keyframes orbFloat2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(-50px, -30px) scale(1.1);
+  }
+}
+
+@keyframes orbFloat3 {
+  0% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(-40%, 30px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* ---- Theme: Clear ---- */
+.theme-clear {
+  --orb-1: rgba(251, 191, 36, 0.20);
+  --orb-2: rgba(245, 158, 11, 0.14);
+  --orb-3: rgba(252, 211, 77, 0.12);
+}
+
+.theme-clear .orb-1 {
+  animation-duration: 10s;
+}
+
+/* ---- Theme: Clouds ---- */
+.theme-clouds {
+  --orb-1: rgba(148, 163, 184, 0.18);
+  --orb-2: rgba(100, 116, 139, 0.14);
+  --orb-3: rgba(71, 85, 105, 0.12);
+}
+
+.theme-clouds .orb-1 {
+  animation-duration: 20s;
+}
+
+.theme-clouds .orb-2 {
+  animation-duration: 24s;
+}
+
+/* ---- Theme: Rain / Drizzle ---- */
+.theme-rain,
+.theme-drizzle {
+  --orb-1: rgba(59, 130, 246, 0.18);
+  --orb-2: rgba(37, 99, 235, 0.14);
+  --orb-3: rgba(96, 165, 250, 0.10);
+}
+
+.theme-rain .orb-1,
+.theme-drizzle .orb-1 {
+  animation-duration: 8s;
+}
+
+/* ---- Theme: Thunderstorm ---- */
+.theme-thunderstorm {
+  --orb-1: rgba(168, 85, 247, 0.22);
+  --orb-2: rgba(139, 92, 246, 0.16);
+  --orb-3: rgba(109, 40, 217, 0.14);
+}
+
+.theme-thunderstorm .orb-1 {
+  animation-duration: 6s;
+  width: 600px;
+  height: 600px;
+}
+
+.theme-thunderstorm .orb-2 {
+  animation-duration: 5s;
+}
+
+/* ---- Theme: Snow ---- */
+.theme-snow {
+  --orb-1: rgba(224, 231, 255, 0.20);
+  --orb-2: rgba(199, 210, 254, 0.15);
+  --orb-3: rgba(165, 180, 252, 0.10);
+}
+
+.theme-snow .orb-1 {
+  animation-duration: 25s;
+}
+
+/* ---- Theme: Atmosphere (mist/fog) ---- */
+.theme-atmosphere {
+  --orb-1: rgba(148, 163, 184, 0.22);
+  --orb-2: rgba(203, 213, 225, 0.12);
+  --orb-3: rgba(226, 232, 240, 0.08);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   GLASS PANEL — the main card
+   ============================================================ */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(40px) saturate(1.4);
+  -webkit-backdrop-filter: blur(40px) saturate(1.4);
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  animation: panelEntry 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Subtle top highlight */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgba(255, 255, 255, 0.15) 50%, transparent 90%);
+}
+
+@keyframes panelEntry {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.app-header {
+  margin-bottom: 36px;
+}
+
+.app-header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 6px;
+  background: linear-gradient(180deg, #FFFFFF 20%, rgba(255, 255, 255, 0.55) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.app-header p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   SEARCH BAR — Micro-interactions & expanding glow
+   ============================================================ */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--card-border);
+  padding: 5px 5px 5px 16px;
+  border-radius: 100px;
+  transition: border-color 0.4s ease, background 0.4s ease;
+  z-index: 1;
+}
+
+/* Glow ring (hidden by default, scales up on focus) */
+.search-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: conic-gradient(from 180deg, var(--primary-glow), transparent, var(--primary-glow));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: scale(0.98);
+  filter: blur(6px);
+}
+
+.search-bar--focused .search-glow {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.search-bar--focused {
+  border-color: rgba(129, 140, 248, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.search-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.search-bar--focused .search-icon {
+  color: var(--primary);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  padding: 10px 0;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 300;
+}
+
+.search-button {
+  background: var(--primary);
+  color: #0a0c14;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 100px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+}
+
+.search-button:hover:not(:disabled) {
+  background: #a5b4fc;
+  transform: scale(1.04);
+  box-shadow: 0 4px 20px -4px var(--primary-glow);
+}
+
+.search-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.search-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mini spinner inside button */
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(10, 12, 20, 0.3);
+  border-top-color: #0a0c14;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================================
+   STAGGERED ENTRANCE ANIMATIONS
+   Each .stagger-N class delays its entrance sequentially.
+   ============================================================ */
+.stagger-1,
+.stagger-2,
+.stagger-3,
+.stagger-4,
+.stagger-5 {
+  opacity: 0;
+  animation: staggerIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.15s;
+}
+
+.stagger-3 {
+  animation-delay: 0.25s;
+}
+
+.stagger-4 {
+  animation-delay: 0.35s;
+}
+
+.stagger-5 {
+  animation-delay: 0.45s;
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   3D LIFT — card-lift class for hover micro-interactions
+   ============================================================ */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.4);
+  border-color: var(--card-border-hover);
+}
+
+/* ============================================================
+   WEATHER DISPLAY
+   ============================================================ */
+.weather-display {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-header {
+  text-align: center;
+}
+
+.city-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.03em;
+}
+
+.weather-condition {
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  font-size: 0.95rem;
+  margin-bottom: 28px;
+}
+
+/* ---- Main temperature card ---- */
+.weather-main {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 22px;
+  padding: 32px 28px;
+  margin-bottom: 20px;
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle inner shimmer on hover */
+.weather-main::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.weather-main:hover::after {
+  opacity: 1;
+}
+
+.weather-icon-container {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   ANIMATED WEATHER ICONS — SVG Styles
+   ============================================================ */
+.wx-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: iconBounce 3s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ---- Sun ---- */
+.sun-glow {
+  fill: rgba(251, 191, 36, 0.12);
+  animation: sunGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes sunGlowPulse {
+
+  0%,
+  100% {
+    r: 34;
+    opacity: 0.5;
+    fill: rgba(251, 191, 36, 0.10);
+  }
+
+  50% {
+    r: 40;
+    opacity: 0.9;
+    fill: rgba(251, 191, 36, 0.20);
+  }
+}
+
+.sun-core {
+  fill: #fbbf24;
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.6));
+}
+
+.sun-rays {
+  transform-origin: 50px 50px;
+  animation: sunRaysSpin 20s linear infinite;
+}
+
+@keyframes sunRaysSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Small sun (behind cloud) */
+.sun-core-sm {
+  fill: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+}
+
+.sun-rays-sm {
+  transform-origin: 35px 35px;
+  animation: sunRaysSmSpin 18s linear infinite;
+}
+
+@keyframes sunRaysSmSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Moon ---- */
+.moon-glow {
+  fill: rgba(203, 213, 225, 0.08);
+  animation: moonGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes moonGlowPulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.moon-body {
+  filter: drop-shadow(0 0 10px rgba(203, 213, 225, 0.3));
+}
+
+.star {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.star-1 {
+  animation-delay: 0s;
+}
+
+.star-2 {
+  animation-delay: 0.7s;
+}
+
+.star-3 {
+  animation-delay: 1.4s;
+}
+
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    r: 1;
+  }
+
+  50% {
+    opacity: 1;
+    r: 2;
+  }
+}
+
+/* ---- Cloud body (shared) ---- */
+.cloud-body {
+  fill: rgba(203, 213, 225, 0.85);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.cloud-dark {
+  fill: rgba(100, 116, 139, 0.9);
+}
+
+/* ---- Cloud float ---- */
+.cloud-float {
+  animation: cloudDrift 6s ease-in-out infinite alternate;
+}
+
+@keyframes cloudDrift {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(4px);
+  }
+}
+
+/* ---- Broken clouds ---- */
+.cloud-back {
+  fill: rgba(148, 163, 184, 0.6);
+  animation: cloudDriftBack 8s ease-in-out infinite alternate;
+}
+
+.cloud-front {
+  fill: rgba(203, 213, 225, 0.85);
+  animation: cloudDriftFront 6s ease-in-out infinite alternate;
+}
+
+@keyframes cloudDriftBack {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-3px);
+  }
+}
+
+@keyframes cloudDriftFront {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(4px);
+  }
+}
+
+/* ---- Raindrops ---- */
+.raindrop {
+  stroke: #60a5fa;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: rainFall 1s ease-in infinite;
+}
+
+.drop-1 {
+  animation-delay: 0s;
+}
+
+.drop-2 {
+  animation-delay: 0.2s;
+}
+
+.drop-3 {
+  animation-delay: 0.45s;
+}
+
+.drop-4 {
+  animation-delay: 0.65s;
+}
+
+.drop-5 {
+  animation-delay: 0.35s;
+}
+
+@keyframes rainFall {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  30% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ---- Lightning ---- */
+.lightning-bolt {
+  fill: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.7));
+  animation: lightningFlash 3s ease-in-out infinite;
+}
+
+@keyframes lightningFlash {
+
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  12% {
+    opacity: 0.2;
+  }
+
+  15% {
+    opacity: 0.9;
+  }
+
+  20% {
+    opacity: 0;
+  }
+
+  70% {
+    opacity: 0;
+  }
+
+  74% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 0;
+  }
+}
+
+/* ---- Snowflakes ---- */
+.snowflake {
+  fill: #e2e8f0;
+  stroke: #e2e8f0;
+  color: #e2e8f0;
+  animation: snowDrift 3s ease-in-out infinite;
+}
+
+.sf-1 {
+  animation-delay: 0s;
+}
+
+.sf-2 {
+  animation-delay: 1s;
+}
+
+.sf-3 {
+  animation-delay: 2s;
+}
+
+@keyframes snowDrift {
+  0% {
+    opacity: 0.3;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(8px) rotate(30deg);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+/* ---- Mist lines ---- */
+.mist-line {
+  stroke: rgba(203, 213, 225, 0.5);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.mist-1 {
+  animation: mistFade 4s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.mist-2 {
+  animation: mistFade 4s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.mist-3 {
+  animation: mistFade 4s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+
+.mist-4 {
+  animation: mistFade 4s ease-in-out infinite;
+  animation-delay: 2.4s;
+}
+
+@keyframes mistFade {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(-3px);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translateX(3px);
+  }
+}
+
+.temperature-container {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.temperature {
+  font-family: 'Outfit', sans-serif;
+  font-size: 4.2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.temp-degree {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+  position: relative;
+  top: -0.15em;
+  margin-left: 2px;
+}
+
+.temp-unit {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: 1px;
+}
+
+/* ---- Detail cards ---- */
+.weather-details {
+  display: flex;
+  gap: 12px;
+}
+
+.detail-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--card-border);
+  padding: 20px 16px;
+  border-radius: 18px;
+}
+
+.detail-icon {
+  color: var(--primary);
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.detail-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.detail-value small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0 8px;
+  color: var(--text-secondary);
+  animation: staggerIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.empty-icon {
+  opacity: 0.25;
+  animation: emptyFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes emptyFloat {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-8px);
+  }
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+/* ============================================================
+   SKELETON LOADER
+   ============================================================ */
+.skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.skeleton-line,
+.skeleton-card,
+.skeleton-detail-card,
+.skeleton-circle {
+  background: linear-gradient(110deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.08) 40%,
+      rgba(255, 255, 255, 0.04) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-city {
+  width: 55%;
+  height: 28px;
+  margin: 0 auto 10px;
+  border-radius: 8px;
+}
+
+.skeleton-condition {
+  width: 35%;
+  height: 16px;
+  margin: 0 auto 28px;
+  border-radius: 8px;
+}
+
+.skeleton-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+  border-radius: 22px;
+  min-height: 120px;
+}
+
+.skeleton-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-temp {
+  width: 100px;
+  height: 48px;
+  border-radius: 10px;
+}
+
+.skeleton-details {
+  display: flex;
+  gap: 12px;
+}
+
+.skeleton-detail-card {
+  flex: 1;
+  height: 90px;
+  border-radius: 18px;
+}
+
+/* ============================================================
+   ERROR STATE
+   ============================================================ */
+.weather-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  padding: 20px 24px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   SHARED KEYFRAMES
+   ============================================================ */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 16px;
+  }
+
+  .glass-panel {
+    padding: 32px 20px;
+    border-radius: 22px;
+  }
+
+  .temperature {
+    font-size: 3.4rem;
+  }
+
+  .weather-details {
+    flex-direction: column;
+  }
+
+  .detail-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
