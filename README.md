@@ -28,6 +28,47 @@
 
 ---
 
+## 🏗️ Architecture & Technical Decisions
+
+### Hybrid API Approach
+
+Meteor uses a **decoupled, dual-API architecture** designed to bypass the limitations of free-tier weather services while maximising data quality:
+
+1. **Geocoding — [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api)**
+   City search and autocomplete are routed through Open-Meteo's geocoding endpoint. This was chosen over OpenWeatherMap's built-in geocoder for two critical reasons:
+   - **Population-weighted ranking** — Results are natively sorted by global population, so "London" resolves to London, GB (9M) before London, ON, CA (400K) without any client-side heuristics.
+   - **High-quality prefix matching** — The API performs server-side prefix search, enabling responsive suggestions from partial input (e.g., `Istan` → Istanbul, TR).
+
+2. **Meteorological Data — [OpenWeatherMap Current Weather API](https://openweathermap.org/current)**
+   Once a city is selected, Meteor forwards the **exact latitude/longitude** returned by Open-Meteo to OpenWeatherMap's `/weather` endpoint. Coordinate-based lookups eliminate the ambiguity of string-based city queries and guarantee that the returned weather data corresponds precisely to the intended location.
+
+```
+User Input ──▶ Open-Meteo Geocoding (prefix search, ranked by population)
+                        │
+                        ▼
+              { lat, lon, name, country }
+                        │
+                        ▼
+              OpenWeatherMap /weather?lat=...&lon=... (precise meteorological data)
+```
+
+> **Why not a single API?** Free-tier OpenWeatherMap geocoding lacks population ranking and returns inconsistent results for common city names. Conversely, Open-Meteo excels at geocoding but its weather data coverage is forecast-oriented rather than current-conditions-focused. The hybrid approach cherry-picks the strongest capability of each service — at zero cost.
+
+### Known Limitations: Typo Tolerance
+
+To keep Meteor **100% free and open-source** — with no credit-card-backed enterprise API keys required (e.g., Google Places, Algolia) — the search engine intentionally relies on **strict prefix matching** rather than computationally expensive fuzzy matching algorithms (e.g., Levenshtein distance, Jaro-Winkler).
+
+| Input | Result | Why |
+|-------|--------|-----|
+| `Istan` | ✅ Istanbul, TR | Valid prefix — matched correctly |
+| `New Y` | ✅ New York, US | Valid prefix — matched correctly |
+| `Istanbuk` | ❌ No result | Typo — not a valid prefix, no fuzzy correction |
+| `Londn` | ❌ No result | Typo — would require edit-distance computation |
+
+This is a **deliberate architectural trade-off**: by accepting prefix-only matching, the application avoids external dependencies on paid NLP/search services, keeping the barrier to entry at exactly one free API key.
+
+---
+
 ## 🛠️ Tech Stack
 
 | Layer         | Technology                                                         |

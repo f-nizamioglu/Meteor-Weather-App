@@ -60,7 +60,11 @@ function App() {
         </header>
 
         <main className="app-main">
-          <SearchBar onSearch={handleSearch} loading={loading} />
+          <SearchBar 
+            onSearch={handleSearch} 
+            loading={loading} 
+            onTyping={() => setError(null)} 
+          />
 
           {loading && <SkeletonLoader />}
 
