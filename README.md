@@ -3,6 +3,7 @@
 # ☄️ Meteor
 
 **A premium, real-time weather application with dynamic weather-reactive backgrounds, hand-crafted animated SVG icons, and a glassmorphism UI — built with React & Vite.**
+[**🌍 View Live Demo**](https://meteor-weather-app-sigma.vercel.app/)
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
